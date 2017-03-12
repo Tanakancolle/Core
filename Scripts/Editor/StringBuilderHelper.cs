@@ -155,6 +155,19 @@ public class StringBuilderHelper
     }
 
     /// <summary>
+    /// 列挙型定義
+    /// </summary>
+    /// <param name="builder">ビルダー</param>
+    /// <param name="enum_name">列挙型名</param>
+    /// <param name="contents">内容配列</param>
+    /// <param name="tab_num">タブ数</param>
+    /// <param name="summary">説明</param>
+    public static void EditEnum(StringBuilder builder, string enum_name, string[] contents, int tab_num = 0, string summary = "")
+    {
+        EditEnum (builder, enum_name, JoinStrings (contents, tab_num + 1), tab_num, summary);
+    }
+
+    /// <summary>
     /// 列挙型定義 ※「}」あり
     /// </summary>
     /// <param name="builder">ビルダー</param>
@@ -200,6 +213,10 @@ public class StringBuilderHelper
     /// <param name="tab_num">タブ数</param>
     public static void EditSummary(StringBuilder builder, string summary, int tab_num = 0)
     {
+        if( string.IsNullOrEmpty(summary)) {
+            return;
+        }
+
         // タブ設定
         string tab = SetTab (tab_num); 
 
@@ -216,8 +233,10 @@ public class StringBuilderHelper
     /// <param name="tab_num">タブ数</param>
     /// <param name="delimit">結合時に挿入する文字</param>
     /// <returns>結合された文字列</returns>
-    public static void JoinStrings(StringBuilder builder, string[] string_array, int tab_num, string delimit = ",\n", string start = "", string end = "")
+    public static string JoinStrings(string[] string_array, int tab_num, string delimit = ",\n", string start = "", string end = "")
     {
+        StringBuilder builder = new StringBuilder ();
+
         // タブ設定
         string tab = SetTab (tab_num);
 
@@ -232,6 +251,8 @@ public class StringBuilderHelper
             // 結合
             builder.Append(tab + start + string_array [i] + end + delimit);
         }
+
+        return builder.ToString ();
     }
 
     /// <summary>
