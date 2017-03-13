@@ -255,6 +255,12 @@ public class StringBuilderHelper
         return builder.ToString ();
     }
 
+    public static string ReplaceEnumInvaild(string str, string replace)
+    {
+        // TODO : 実装する
+        return null;
+    }
+
     /// <summary>
     /// 列挙型最初無効文字検索
     /// </summary>
@@ -262,7 +268,8 @@ public class StringBuilderHelper
     /// <returns>見つかった無効文字</returns>
     public static string FindEnumFirstInvaild(string str)
     {
-        return FindInvaild (str, StringBuilderHelper.enumFirstInvalidChars);
+        // TODO : 実装する
+        return null;
     }
 
     /// <summary>
