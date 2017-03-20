@@ -23,12 +23,12 @@ public class StringBuilderHelper
     /// <summary>
     /// 一文字目識別子正規表現
     /// </summary>
-    private static Regex firstIdentifierRegex = new Regex (string.Format ("{0}_*", firstIdentifierPattern));
+    private static Regex firstIdentifierRegex = new Regex (string.Format ("^{0}", firstIdentifierPattern));
 
     /// <summary>
     /// 識別子正規表現
     /// </summary>
-    private static Regex identifierRegex = new Regex (string.Format ("({0}|{1})*", firstIdentifierPattern, identifierPattern)); 
+    private static Regex identifierRegex = new Regex (string.Format ("({0}|{1})+", firstIdentifierPattern, identifierPattern)); 
 
     /// <summary>
     /// 置き換え文字
@@ -278,22 +278,20 @@ public class StringBuilderHelper
 
         var builder = new StringBuilder ();
 
-        if (firstIdentifierRegex.IsMatch (str)) {
+        // 一文字目チェック
+        if (!firstIdentifierRegex.IsMatch (str)) {
             str = str.Substring (1);
             builder.Append (replaceChar);
         }
 
-        var match = identifierRegex.Match (str);
-        while (match.Success) {
-            var match_str = match.ToString ();
-            if(string.IsNullOrEmpty(match_str)) {
+        // 全体チェック
+        var matches = identifierRegex.Matches (str);
+        for (int i = 0; i < matches.Count; ++i) {
+            if (i != 0) {
                 builder.Append (replaceChar);
             }
-            else {
-                builder.Append (match_str);
-            }
 
-            match = match.NextMatch ();
+            builder.Append (matches[i]);
         }
 
         return builder.ToString ();                                            
