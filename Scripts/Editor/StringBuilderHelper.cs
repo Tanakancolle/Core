@@ -2,28 +2,38 @@
 using UnityEditor;
 using System.Text;
 using System;
+using System.Text.RegularExpressions;
 
 /// <summary>
 /// ビルダー補助クラス
 /// </summary>
 public class StringBuilderHelper
 {
-    /// <summary>
-    /// 無効文字配列
-    /// </summary>
-    private static readonly string[] invalidChars = {
-        " ", "!", "\"", "#", "$", "%", "&", "\'", "(", ")", 
-        "-", "=", "^", "~", "\\", "|", "[", "{",  "@", "`", 
-        "]", "}", ":", "*", ";", "+", "/", "?", ".", ">", 
-        ",", "<"
-    };
 
     /// <summary>
-    /// 列挙型最初無効文字配列
+    /// 一文字目識別子パターン
     /// </summary>
-    private static readonly string[] enumFirstInvalidChars = {
-        "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"
-    };
+    private static readonly string firstIdentifierPattern = @"(\p{Lu}|\p{Ll}|\p{Lt}|\p{Lm}|\p{Lo}|\p{Nl})";
+
+    /// <summary>
+    /// 識別子パターン
+    /// </summary>
+    private const string identifierPattern = @"(\p{Mn}|\p{Mc}|\p{Nd}|\p{Pc}|\p{Cf})";
+
+    /// <summary>
+    /// 一文字目識別子正規表現
+    /// </summary>
+    private static Regex firstIdentifierRegex = new Regex (string.Format ("{0}_*", firstIdentifierPattern));
+
+    /// <summary>
+    /// 識別子正規表現
+    /// </summary>
+    private static Regex identifierRegex = new Regex (string.Format ("({0}|{1})*", firstIdentifierPattern, identifierPattern)); 
+
+    /// <summary>
+    /// 置き換え文字
+    /// </summary>
+    private static readonly string replaceChar = "_";
 
     /// <summary>
     /// タブのスペーズ数
@@ -255,53 +265,40 @@ public class StringBuilderHelper
         return builder.ToString ();
     }
 
-    public static string ReplaceEnumInvaild(string str, string replace)
-    {
-        // TODO : 実装する
-        return null;
-    }
-
     /// <summary>
-    /// 列挙型最初無効文字検索
+    /// 列挙型無効文字置換
     /// </summary>
-    /// <param name="str">検索する文字列</param>
-    /// <returns>見つかった無効文字</returns>
-    public static string FindEnumFirstInvaild(string str)
-    {
-        // TODO : 実装する
-        return null;
-    }
-
-    /// <summary>
-    /// 無効文字検索
-    /// </summary>
-    /// <param name="str">検索する文字列</param>
-    /// <returns>見つかった無効文字</returns>
-    public static string FindInvaild(string str)
-    {
-        return FindInvaild (str, StringBuilderHelper.invalidChars);
-    }
-
-    /// <summary>
-    /// 無効文字検索
-    /// </summary>
-    /// <param name="str">検索する文字列</param>
-    /// <param name="invaild_chars">無効文字配列</param>
-    /// <returns>見つかった無効文字</returns>
-    public static string FindInvaild(string str, string[] invaild_chars)
-    {
-        // 無効文字があるか検索
-        foreach (var c in invaild_chars) {
-            // 無効文字チェック
-            if (0 <= str.IndexOf (c)) {
-                // 無効文字あり
-                return c;
-            }
+    /// <param name="str">置き換える文字列</param>
+    /// <returns>置き換えた文字列</returns>
+    public static string ReplaceEnumInvaild(string str)
+    {   
+        if( string.IsNullOrEmpty(str)) {
+            return str;
         }
 
-        // 無効文字なし
-        return null;
-    }
+        var builder = new StringBuilder ();
+
+        if (firstIdentifierRegex.IsMatch (str)) {
+            str = str.Substring (1);
+            builder.Append (replaceChar);
+        }
+
+        var match = identifierRegex.Match (str);
+        while (match.Success) {
+            var match_str = match.ToString ();
+            if(string.IsNullOrEmpty(match_str)) {
+                builder.Append (replaceChar);
+            }
+            else {
+                builder.Append (match_str);
+            }
+
+            match = match.NextMatch ();
+        }
+
+        return builder.ToString ();                                            
+    }                                                                   
+
 
     /// <summary>
     /// タブ設定
